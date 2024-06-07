@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Song" ALTER COLUMN "title" SET DEFAULT '',
+ALTER COLUMN "url" SET DEFAULT '',
+ALTER COLUMN "fileId" SET DEFAULT '';
