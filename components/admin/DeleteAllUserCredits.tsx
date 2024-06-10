@@ -1,9 +1,8 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { declineSong } from "@/app/actions";
-import { X } from "lucide-react";
 import { Button } from "../ui/button";
+import { deleteAllCredits } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,18 +14,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
-export function RequestSongAction({ songId }: { songId: string }) {
-  return (
-    <>
-      <DeclineSongDialoag songId={songId} />
-    </>
-  );
-}
-
-function DeclineSongDialoag({ songId }: { songId: string }) {
+export function DeleteAllUserCredits({ big }: { big?: boolean }) {
   async function handleClick() {
-    let result = await declineSong(songId);
+    let result = await deleteAllCredits();
 
     if (!result.success) {
       toast.error(result.error);
@@ -38,20 +30,20 @@ function DeclineSongDialoag({ songId }: { songId: string }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={"ghost"}>
-          <X className="h-4 w-4" />
+        <Button variant={"secondary"} className={cn("", big && "text-xl h-12")}>
+          Delete All User Credits
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Möchtest du diesen Song ablehnen?</AlertDialogTitle>
+          <AlertDialogTitle>Bist du dier sicher?</AlertDialogTitle>
           <AlertDialogDescription>
-            Diese Aktion kann nicht rückgängig gemacht werden.
+            Hiermit werden alle Credits vom jedem Benutzer auf 0 gesetzt.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-          <AlertDialogAction onClick={handleClick}>Ablehnen</AlertDialogAction>
+          <AlertDialogAction onClick={handleClick}>Ausführen</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

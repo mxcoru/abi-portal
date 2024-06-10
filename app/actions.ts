@@ -1,19 +1,29 @@
 "use server";
 
+import { authOptions } from "@/lib/auth";
+import { AppFeatures } from "@/lib/config/feature";
 import { DatabaseClient } from "@/lib/database";
-import { Prisma, Song, SongStatus, User } from "@prisma/client";
+import { IsFeatureEnabled } from "@/lib/feature";
+import { Prisma, Song, SongStatus, UserRole } from "@prisma/client";
+import { getServerSession } from "next-auth";
 
 export type ActionResponse<T> =
   | { success: false; error: string; creditsError: boolean }
   | { success: true; data: T };
 
-export async function deleteSong(
-  userId: string,
-  id: string
-): Promise<ActionResponse<null>> {
+export async function deleteSong(id: string): Promise<ActionResponse<null>> {
   "use server";
 
-  let IsUserAble = await decreaseUserCredits(userId);
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+  let IsUserAble = await decreaseUserCredits(session.user.id);
 
   if (!IsUserAble) {
     return {
@@ -29,13 +39,79 @@ export async function deleteSong(
 }
 
 export async function updateSong(
-  userId: string,
   id: string,
   data: Partial<Song>
 ): Promise<ActionResponse<Song>> {
   "use server";
 
-  let IsUserAble = await decreaseUserCredits(userId);
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let song = await DatabaseClient.song.findFirst({
+    where: { id: id },
+  });
+
+  if (!song) {
+    return {
+      success: false,
+      error: "Dieser Song existiert nicht",
+      creditsError: false,
+    };
+  }
+
+  if (song.userId != session.user.id) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  if (
+    song.title == data.title?.trim() &&
+    song.url == data.url?.trim() &&
+    song.start == data.start &&
+    song.end == data.end
+  ) {
+    return {
+      success: false,
+      error: "Du hast keine Änderungen vorgenommen",
+      creditsError: false,
+    };
+  }
+
+  if (data.start == 0 && data.end == 0) {
+    return {
+      success: false,
+      error: "Du hast keinen Zeitraum angegeben",
+      creditsError: false,
+    };
+  }
+
+  if ((data.end as number) - (data.start as number) > 60 * 2) {
+    return {
+      success: false,
+      error: "Die Zeitraum muss kleiner gleich 2 Minuten sein",
+      creditsError: false,
+    };
+  }
+
+  if ((data.start as number) > (data.end as number)) {
+    return {
+      success: false,
+      error: "Die Startzeit muss kleiner als die Endzeit sein",
+      creditsError: false,
+    };
+  }
+
+  let IsUserAble = await decreaseUserCredits(session.user.id);
 
   if (!IsUserAble) {
     return {
@@ -47,12 +123,18 @@ export async function updateSong(
 
   data.status = SongStatus.REQUESTED;
 
-  let song = await DatabaseClient.song.update({
+  let newSong = await DatabaseClient.song.update({
     where: { id: id },
-    data: data,
+    data: {
+      title: data.title?.trim(),
+      url: data.url?.trim(),
+      start: data.start,
+      end: data.end,
+      status: SongStatus.REQUESTED,
+    },
   });
 
-  return { success: true, data: song };
+  return { success: true, data: newSong };
 }
 
 export async function updateSongOrder(
@@ -61,21 +143,85 @@ export async function updateSongOrder(
 ): Promise<ActionResponse<number>> {
   "use server";
 
-  await DatabaseClient.song.update({
-    where: { id: id },
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let song = await DatabaseClient.song.update({
+    where: { id: id, userId: session.user.id },
     data: { order: order },
   });
+
+  if (!song) {
+    return {
+      success: false,
+      error: "Dieser Song existiert nicht",
+      creditsError: false,
+    };
+  }
 
   return { success: true, data: order };
 }
 
 export async function createSong(
-  userId: string,
   data: Omit<Prisma.SongCreateInput, "user">
 ): Promise<ActionResponse<Song>> {
   "use server";
 
-  let IsUserAble = await decreaseUserCredits(userId);
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.SongCreation,
+    session.user
+  );
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  if (data.start == 0 && data.end == 0) {
+    return {
+      success: false,
+      error: "Du hast keinen Zeitraum angegeben",
+      creditsError: false,
+    };
+  }
+
+  if ((data.start as number) > (data.end as number)) {
+    return {
+      success: false,
+      error: "Die Startzeit muss kleiner als die Endzeit sein",
+      creditsError: false,
+    };
+  }
+
+  if ((data.end as number) - (data.start as number) > 60 * 2) {
+    return {
+      success: false,
+      error: "Die Zeitraum muss kleiner gleich 2 Minuten sein",
+      creditsError: false,
+    };
+  }
+
+  let IsUserAble = await decreaseUserCredits(session.user.id);
 
   if (!IsUserAble) {
     return {
@@ -86,8 +232,11 @@ export async function createSong(
   }
 
   let createData: Prisma.SongCreateInput = {
-    ...data,
-    user: { connect: { id: userId } },
+    title: data.title?.trim(),
+    url: data.url?.trim(),
+    start: data.start,
+    end: data.end,
+    user: { connect: { id: session.user.id } },
   };
 
   let song = await DatabaseClient.song.create({ data: createData });
@@ -95,10 +244,10 @@ export async function createSong(
   return { success: true, data: song };
 }
 
-export async function decreaseUserCredits(id: string): Promise<boolean> {
+async function decreaseUserCredits(id: string): Promise<boolean> {
   "use server";
 
-  let user = await DatabaseClient.user.findUnique({
+  let user = await DatabaseClient.user.findFirst({
     where: { id: id },
     include: { songs: true },
   });
@@ -119,11 +268,15 @@ export async function decreaseUserCredits(id: string): Promise<boolean> {
   return true;
 }
 
-export async function getUserCredits(id: string): Promise<number> {
-  "use server";
+export async function getUserCredits(): Promise<number> {
+  let session = await getServerSession(authOptions);
 
-  let user = await DatabaseClient.user.findUnique({
-    where: { id: id },
+  if (!session?.user) {
+    return 0;
+  }
+
+  let user = await DatabaseClient.user.findFirst({
+    where: { id: session.user.id },
     include: { songs: true },
   });
 
@@ -135,14 +288,63 @@ export async function getUserCredits(id: string): Promise<number> {
 }
 
 export async function createVoteSong(
-  userid: string,
   data: Omit<Prisma.SongVoteRequestCreateInput, "user">
 ): Promise<ActionResponse<null>> {
   "use server";
 
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.VoteSongRequestCreation,
+    session.user
+  );
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  if (data.start == 0 && data.end == 0) {
+    return {
+      success: false,
+      error: "Du hast keinen Zeitraum angegeben",
+      creditsError: false,
+    };
+  }
+
+  if ((data.start as number) > (data.end as number)) {
+    return {
+      success: false,
+      error: "Die Startzeit muss kleiner als die Endzeit sein",
+      creditsError: false,
+    };
+  }
+
+  if ((data.end as number) - (data.start as number) > 60 * 2) {
+    return {
+      success: false,
+      error: "Die Zeitraum muss kleiner gleich 2 Minuten sein",
+      creditsError: false,
+    };
+  }
+
   let createData: Prisma.SongVoteRequestCreateInput = {
-    ...data,
-    user: { connect: { id: userid } },
+    title: data.title?.trim(),
+    url: data.url?.trim(),
+    start: data.start,
+    end: data.end,
+    user: { connect: { id: session.user.id } },
   };
 
   await DatabaseClient.songVoteRequest.create({ data: createData });
@@ -151,10 +353,29 @@ export async function createVoteSong(
 }
 
 export async function voteForSong(
-  userId: string,
   songRequestId: string
 ): Promise<ActionResponse<null>> {
   "use server";
+
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(AppFeatures.Voting, session.user);
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
 
   let songRequest = await DatabaseClient.songVoteRequest.findFirst({
     where: { id: songRequestId },
@@ -164,12 +385,12 @@ export async function voteForSong(
     return {
       success: false,
       error: "Dieser Song ist nicht in deiner Liste",
-      creditsError: true,
+      creditsError: false,
     };
   }
 
   let existingVote = await DatabaseClient.songVote.findFirst({
-    where: { voterId: userId },
+    where: { voterId: session.user.id },
     include: { voter: true },
   });
 
@@ -185,7 +406,7 @@ export async function voteForSong(
   await DatabaseClient.songVote.create({
     data: {
       songRequest: { connect: { id: songRequestId } },
-      voter: { connect: { id: userId } },
+      voter: { connect: { id: session.user.id } },
     },
   });
 
@@ -197,17 +418,36 @@ export async function deleteSongVoteRequest(
 ): Promise<ActionResponse<null>> {
   "use server";
 
-  let songRequest = await DatabaseClient.songVoteRequest.findUnique({
-    where: { id: songRequestId },
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.GroupSongRequestAdmin,
+    session.user
+  );
+
+  let songRequest = await DatabaseClient.songVoteRequest.delete({
+    where: {
+      id: songRequestId,
+      creatorId: isEnabled ? undefined : session.user.id,
+    },
   });
 
   if (!songRequest) {
     return {
       success: false,
       error: "Dieser Song ist nicht in deiner Liste",
-      creditsError: true,
+      creditsError: false,
     };
   }
+
   return { success: true, data: null };
 }
 
@@ -217,7 +457,30 @@ export async function addCredits(
 ): Promise<ActionResponse<null>> {
   "use server";
 
-  let user = await DatabaseClient.user.findUnique({
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.AddUserCredits,
+    session.user
+  );
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let user = await DatabaseClient.user.findFirst({
     where: { id: userId },
   });
 
@@ -225,7 +488,7 @@ export async function addCredits(
     return {
       success: false,
       error: "Dieser Benutzer existiert nicht",
-      creditsError: true,
+      creditsError: false,
     };
   }
 
@@ -237,12 +500,89 @@ export async function addCredits(
   return { success: true, data: null };
 }
 
+export async function setCredits(
+  name: string,
+  amount: number
+): Promise<ActionResponse<null>> {
+  "use server";
+
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.SetUserCredits,
+    session.user
+  );
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  console.log(name);
+
+  let user = await DatabaseClient.user.findFirst({
+    where: {
+      name: {
+        mode: "insensitive",
+        equals: name,
+      },
+    },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      error: "Dieser Benutzer existiert nicht",
+      creditsError: false,
+    };
+  }
+
+  await DatabaseClient.user.update({
+    where: { id: user.id },
+    data: { credits: amount },
+  });
+
+  return { success: true, data: null };
+}
+
 export async function declineSong(
   songId: string
 ): Promise<ActionResponse<null>> {
   "use server";
 
-  let song = await DatabaseClient.song.findUnique({
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  if (
+    session.user.role != UserRole.ADMIN &&
+    session.user.role != UserRole.SUPER_ADMIN
+  ) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let song = await DatabaseClient.song.findFirst({
     where: { id: songId },
   });
 
@@ -250,13 +590,46 @@ export async function declineSong(
     return {
       success: false,
       error: "Dieser Song existiert nicht",
-      creditsError: true,
+      creditsError: false,
     };
   }
 
   await DatabaseClient.song.update({
     where: { id: song.id },
     data: { status: SongStatus.DECLINED },
+  });
+
+  return { success: true, data: null };
+}
+
+export async function deleteAllCredits(): Promise<ActionResponse<null>> {
+  "use server";
+
+  let session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  let isEnabled = await IsFeatureEnabled(
+    AppFeatures.DeleteAllUserCredits,
+    session.user
+  );
+
+  if (!isEnabled) {
+    return {
+      success: false,
+      error: "Du hast nicht die nötige Berechtigung",
+      creditsError: false,
+    };
+  }
+
+  await DatabaseClient.user.updateMany({
+    data: { credits: 0 },
   });
 
   return { success: true, data: null };

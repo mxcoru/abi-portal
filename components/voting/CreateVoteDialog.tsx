@@ -15,16 +15,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createVoteSong } from "@/app/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function VoteSongCreateDialog({
-  userId,
   disabled,
+  big,
 }: {
-  userId: string;
   disabled?: boolean;
+  big?: boolean;
 }) {
   if (disabled) {
-    return <p className="text-muted">Einlauf Song erstellen</p>;
+    return <p className="text-muted">Gruppen Song einreichen</p>;
   }
 
   let song = {
@@ -35,7 +36,7 @@ export function VoteSongCreateDialog({
   };
 
   async function handleClick() {
-    let result = await createVoteSong(userId, song);
+    let result = await createVoteSong(song);
 
     if (!result.success) {
       toast.error(result.error);
@@ -47,7 +48,12 @@ export function VoteSongCreateDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <p className="cursor-pointer">Stufen Song einreichen</p>
+        <Button
+          variant={"secondary"}
+          className={cn("w-full", big && "text-xl h-12")}
+        >
+          Gruppen Song einreichen
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

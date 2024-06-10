@@ -1,27 +1,37 @@
-import { IsFeatureEnabled } from "@/lib/feature";
-import { AppFeatures } from "@/lib/config/feature";
 import { InternalLoginButton, InternalLogoutButton } from "./InternalButtons";
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
 
-export async function LoginButton() {
-  const IsLoginEnabled = await IsFeatureEnabled(AppFeatures.Authentication);
-
-  return <InternalLoginButton enabled={IsLoginEnabled} />;
+export function LoginButton({
+  isAuthEnabled,
+  big,
+}: {
+  isAuthEnabled: boolean;
+  big?: boolean;
+}) {
+  return <InternalLoginButton enabled={isAuthEnabled} big={big} />;
 }
 
-export async function LogoutButton() {
-  const IsLogoutEnabled = await IsFeatureEnabled(AppFeatures.Authentication);
-
-  return <InternalLogoutButton enabled={IsLogoutEnabled} />;
+export function LogoutButton({
+  isAuthEnabled,
+  big,
+}: {
+  isAuthEnabled: boolean;
+  big?: boolean;
+}) {
+  return <InternalLogoutButton enabled={isAuthEnabled} big={big} />;
 }
 
-export async function AuthButton() {
-  const session = await getServerSession(authOptions);
-
-  if (session) {
-    return <LogoutButton />;
+export function AuthButton({
+  isLoggedIn,
+  isAuthEnabled,
+  big,
+}: {
+  isLoggedIn: boolean;
+  isAuthEnabled: boolean;
+  big?: boolean;
+}) {
+  if (isLoggedIn) {
+    return <LogoutButton isAuthEnabled={isAuthEnabled} big={big} />;
   }
 
-  return <LoginButton />;
+  return <LoginButton isAuthEnabled={isAuthEnabled} big={big} />;
 }

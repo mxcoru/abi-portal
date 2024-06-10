@@ -1,13 +1,20 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { signIn, signOut } from "next-auth/react";
 
-export async function InternalLoginButton({ enabled }: { enabled: boolean }) {
+export function InternalLoginButton({
+  enabled,
+  big,
+}: {
+  enabled: boolean;
+  big?: boolean;
+}) {
   return (
     <Button
       variant={"outline"}
-      className="w-full"
+      className={cn("w-full", big && "text-xl h-12")}
       onClick={() => {
         signIn("authentik");
       }}
@@ -18,11 +25,17 @@ export async function InternalLoginButton({ enabled }: { enabled: boolean }) {
   );
 }
 
-export async function InternalLogoutButton({ enabled }: { enabled: boolean }) {
+export function InternalLogoutButton({
+  enabled,
+  big,
+}: {
+  enabled: boolean;
+  big?: boolean;
+}) {
   return (
     <Button
       variant={"outline"}
-      className="w-full"
+      className={cn("w-full", big && "text-xl h-12")}
       onClick={() => {
         signOut();
       }}

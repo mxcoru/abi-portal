@@ -41,7 +41,7 @@ export function SongActions({ song }: { song: Song }) {
 
 function SongEditDialog({ song }: { song: Song }) {
   async function handleClick() {
-    let result = await updateSong(song.userId, song.id, song);
+    let result = await updateSong(song.id, song);
 
     if (!result.success) {
       toast.error(result.error);
@@ -181,7 +181,7 @@ function SongNewOrderDialog({ song }: { song: Song }) {
 
 function SongDeleteDialog({ song }: { song: Song }) {
   async function handleClick() {
-    let result = await deleteSong(song.userId, song.id);
+    let result = await deleteSong(song.id);
 
     if (!result.success) {
       toast.error(result.error);

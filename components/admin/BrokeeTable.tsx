@@ -9,12 +9,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-function BrokeRow({ user }: { user: User }) {
+function BrokeRow({
+  user,
+  canAddCredits,
+}: {
+  user: User;
+  canAddCredits: boolean;
+}) {
   return (
     <TableRow>
       <TableCell>{user.name}</TableCell>
       <TableCell>
-        <BrokeeAction userId={user.id} />
+        <BrokeeAction userId={user.id} cannAddCredits={canAddCredits} />
       </TableCell>
     </TableRow>
   );
@@ -32,7 +38,13 @@ function EmptyBrokeeRow() {
   );
 }
 
-export function BrokeeTable({ users }: { users: User[] }) {
+export function BrokeeTable({
+  users,
+  canAddCredits,
+}: {
+  users: User[];
+  canAddCredits: boolean;
+}) {
   let ShouldDisplayEmptyRow = users.length == 0;
 
   return (
@@ -47,7 +59,9 @@ export function BrokeeTable({ users }: { users: User[] }) {
         {ShouldDisplayEmptyRow ? (
           <EmptyBrokeeRow key={"empty-song-row"} />
         ) : (
-          users.map((user) => <BrokeRow key={user.id} user={user} />)
+          users.map((user) => (
+            <BrokeRow key={user.id} user={user} canAddCredits={canAddCredits} />
+          ))
         )}
       </TableBody>
     </Table>

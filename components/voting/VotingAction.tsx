@@ -30,11 +30,7 @@ export function VoteAction({
 }) {
   return (
     <>
-      <VoteSongDialog
-        voteRequest={voteRequest}
-        userId={userId}
-        disabled={!votingEnabled}
-      />
+      <VoteSongDialog voteRequest={voteRequest} disabled={!votingEnabled} />
       {(canDeleteAll || userId == voteRequest.creatorId) && (
         <DeleteVoteSongDialog voteRequest={voteRequest} />
       )}
@@ -44,15 +40,13 @@ export function VoteAction({
 
 function VoteSongDialog({
   voteRequest,
-  userId,
   disabled: disabled,
 }: {
   voteRequest: SongVoteRequest;
-  userId: string;
   disabled: boolean;
 }) {
   async function handleClick() {
-    let result = await voteForSong(userId, voteRequest.id);
+    let result = await voteForSong(voteRequest.id);
 
     if (!result.success) {
       toast.error(result.error);

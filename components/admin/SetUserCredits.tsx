@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { addCredits } from "@/app/actions";
-import { DollarSign } from "lucide-react";
+import { addCredits, setCredits } from "@/app/actions";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -15,32 +14,34 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
-export function BrokeeAction({
-  userId,
-  cannAddCredits,
+export function SetUserCredits({
+  canSetCredits,
+  big,
 }: {
-  userId: string;
-  cannAddCredits: boolean;
+  canSetCredits: boolean;
+  big?: boolean;
 }) {
   return (
     <>
-      <AddCreditsDialog userId={userId} canAddCredits={cannAddCredits} />
+      <SetCreditsDialog canSetCredits={canSetCredits} big={big} />
     </>
   );
 }
 
-function AddCreditsDialog({
-  userId,
-  canAddCredits,
+function SetCreditsDialog({
+  canSetCredits,
+  big,
 }: {
-  userId: string;
-  canAddCredits: boolean;
+  canSetCredits: boolean;
+  big?: boolean;
 }) {
   let credits = 0;
+  let name = "";
 
   async function handleClick() {
-    let result = await addCredits(userId, credits);
+    let result = await setCredits(name, credits);
 
     if (!result.success) {
       toast.error(result.error);
@@ -52,19 +53,34 @@ function AddCreditsDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant={"ghost"} disabled={!canAddCredits}>
-          Füge Credits hinzu
-          <DollarSign className="h-4 w-4 mx-1" />
+        <Button
+          variant={"secondary"}
+          disabled={!canSetCredits}
+          className={cn("", big && "text-xl h-12")}
+        >
+          Setze Credits vom Benutzer
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Füge dem Benutzer Credits hinzu</DialogTitle>
+          <DialogTitle>Setze dem Benutzer Credits</DialogTitle>
           <DialogDescription>
-            Setze den Wert hier ein, um Credits zu hinzufügen.
+            Setze den Wert hier ein, um Credits die jeweiligen Credits zu
+            setzen.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Name
+            </Label>
+            <Input
+              id="name"
+              className="col-span-3"
+              type="string"
+              onChange={(e) => (name = e.target.value)}
+            />
+          </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Credits

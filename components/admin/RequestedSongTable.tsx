@@ -1,4 +1,4 @@
-import { Song } from "@prisma/client";
+import { Song, User } from "@prisma/client";
 import {
   Table,
   TableBody,
@@ -10,9 +10,10 @@ import {
 import { formatSeconds } from "@/lib/format";
 import { RequestSongAction } from "./RequestedSongAction";
 
-function RequestSongRow({ song }: { song: Song }) {
+function RequestSongRow({ song }: { song: Song & { user: User } }) {
   return (
     <TableRow>
+      <TableCell>{song.user.name}</TableCell>
       <TableCell>{song.title}</TableCell>
       <TableCell>{song.url}</TableCell>
       <TableCell>{formatSeconds(song.start)}</TableCell>
@@ -36,13 +37,18 @@ function EmptyRequestedSongRow() {
   );
 }
 
-export function RequestedSongTable({ songs }: { songs: Song[] }) {
+export function RequestedSongTable({
+  songs,
+}: {
+  songs: (Song & { user: User })[];
+}) {
   let ShouldDisplayEmptyRow = songs.length == 0;
 
   return (
     <Table className="">
       <TableHeader>
         <TableRow>
+          <TableHead className="text-left">Ersteller</TableHead>
           <TableHead className="text-left">Titel</TableHead>
           <TableHead className="text-left">URL</TableHead>
           <TableHead className="text-left">Start</TableHead>

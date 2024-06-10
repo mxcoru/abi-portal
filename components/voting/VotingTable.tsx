@@ -1,4 +1,4 @@
-import { SongVote, SongVoteRequest } from "@prisma/client";
+import { Song, SongVote, SongVoteRequest, User } from "@prisma/client";
 import { VoteAction } from "./VotingAction";
 import {
   Table,
@@ -11,20 +11,28 @@ import {
 import { formatSeconds } from "@/lib/format";
 
 function VoteRow({
-  voteRequest: song,
+  voteRequest,
   voted,
   userId,
   canDeleteAll,
   votingEnabled,
 }: {
-  voteRequest: SongVoteRequest;
+  voteRequest: SongVoteRequest & { votes: SongVote[]; user: User };
   voted: boolean;
   userId: string;
   canDeleteAll: boolean;
   votingEnabled: boolean;
 }) {
   return (
-    <TableRow key={song.id}>
+    <TableRow key={voteRequest.id}>
+      {canDeleteAll && (
+        <TableCell className="hidden lg:table-cell text-center">
+          {voteRequest.user.name}
+        </TableCell>
+      )}
+      <TableCell className="text-center">
+        <p>{voteRequest.votes.length}</p>
+      </TableCell>
       <TableCell className="text-center w-100  ">
         {voted ? (
           <span className="text-green-500">Ja</span>
@@ -32,17 +40,17 @@ function VoteRow({
           <span className="text-red-500">Nein</span>
         )}
       </TableCell>
-      <TableCell>{song.title}</TableCell>
-      <TableCell className="hidden md:table-cell">{song.url}</TableCell>
+      <TableCell>{voteRequest.title}</TableCell>
+      <TableCell className="hidden md:table-cell">{voteRequest.url}</TableCell>
       <TableCell className="hidden lg:table-cell">
-        {formatSeconds(song.start)}
+        {formatSeconds(voteRequest.start)}
       </TableCell>
       <TableCell className="hidden lg:table-cell">
-        {formatSeconds(song.end)}
+        {formatSeconds(voteRequest.end)}
       </TableCell>
       <TableCell>
         <VoteAction
-          voteRequest={song}
+          voteRequest={voteRequest}
           userId={userId}
           canDeleteAll={canDeleteAll}
           votingEnabled={!voted && votingEnabled}
@@ -71,7 +79,7 @@ export function VotingTable({
   canDeleteAll,
   votingEnabled,
 }: {
-  songRequests: SongVoteRequest[];
+  songRequests: (SongVoteRequest & { votes: SongVote[]; user: User })[];
   vote: SongVote | null;
   userId: string;
   canDeleteAll: boolean;
@@ -83,6 +91,10 @@ export function VotingTable({
     <Table className="overflow-y-auto">
       <TableHeader>
         <TableRow>
+          {canDeleteAll && (
+            <TableHead className="hidden lg:table-cell">Ersteller</TableHead>
+          )}
+          <TableHead>Stimmen</TableHead>
           <TableHead className="text-left">Gewählt</TableHead>
           <TableHead>Titel</TableHead>
           <TableHead className="hidden md:table-cell">Url</TableHead>

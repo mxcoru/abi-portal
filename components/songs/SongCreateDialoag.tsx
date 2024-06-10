@@ -15,16 +15,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSong } from "@/app/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function SongCreateDialog({
-  userId,
   disabled,
+  big,
 }: {
-  userId: string;
   disabled?: boolean;
+  big?: boolean;
 }) {
   if (disabled) {
-    return <p className="text-muted">Song erstellen</p>;
+    return <p className="text-muted">Perönlichen Song einreichen</p>;
   }
 
   let song = {
@@ -35,7 +36,7 @@ export function SongCreateDialog({
   };
 
   async function handleClick() {
-    let result = await createSong(userId, song);
+    let result = await createSong(song);
 
     if (!result.success) {
       toast.error(result.error);
@@ -47,13 +48,18 @@ export function SongCreateDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <p className="cursor-pointer">Song erstellen</p>
+        <Button
+          variant={"secondary"}
+          className={cn("w-full", big && "text-xl h-12")}
+        >
+          Perönlichen Song einreichen
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Deinen Song einreichen</DialogTitle>
           <DialogDescription>
-            Hier kannst du deinen Song erstellen
+            Hier kannst du deinen Perönlichen Song einreichen
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
