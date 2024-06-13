@@ -10,7 +10,7 @@ import {
 import { formatSeconds } from "@/lib/format";
 import { RequestSongAction } from "./RequestedSongAction";
 
-function RequestSongRow({ song }: { song: Song & { user: User } }) {
+function RequestSongRow({ song, download }: { song: Song & { user: User }, download?: boolean }) {
   return (
     <TableRow>
       <TableCell>{song.user.name}</TableCell>
@@ -19,7 +19,7 @@ function RequestSongRow({ song }: { song: Song & { user: User } }) {
       <TableCell>{formatSeconds(song.start)}</TableCell>
       <TableCell>{formatSeconds(song.end)}</TableCell>
       <TableCell>
-        <RequestSongAction songId={song.id} />
+        <RequestSongAction songId={song.id} download={download} />
       </TableCell>
     </TableRow>
   );
@@ -39,8 +39,10 @@ function EmptyRequestedSongRow() {
 
 export function RequestedSongTable({
   songs,
+  download
 }: {
   songs: (Song & { user: User })[];
+  download?: boolean;
 }) {
   let ShouldDisplayEmptyRow = songs.length == 0;
 
@@ -60,7 +62,7 @@ export function RequestedSongTable({
         {ShouldDisplayEmptyRow ? (
           <EmptyRequestedSongRow key={"empty-song-row"} />
         ) : (
-          songs.map((song) => <RequestSongRow key={song.id} song={song} />)
+          songs.map((song) => <RequestSongRow key={song.id} song={song} download={download} />)
         )}
       </TableBody>
     </Table>

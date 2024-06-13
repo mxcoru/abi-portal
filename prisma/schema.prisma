@@ -20,21 +20,23 @@ enum UserRole {
 }
 
 model User {
-  id            String            @id @default(cuid())
-  name          String?
-  email         String            @unique
-  emailVerified DateTime?
-  image         String?
-  credits       Int               @default(5)
-  role          UserRole          @default(MEMBER)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  CreatedVotes  SongVoteRequest[]
-  accounts      Account[]
-  sessions      Session[]
-  songs         Song[]
-  Authenticator Authenticator[]
-  SongVote      SongVote?
+  id                 String               @id @default(cuid())
+  name               String?
+  email              String               @unique
+  emailVerified      DateTime?
+  image              String?
+  credits            Int                  @default(5)
+  role               UserRole             @default(MEMBER)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  CreatedVotes       SongVoteRequest[]
+  accounts           Account[]
+  sessions           Session[]
+  songs              Song[]
+  Authenticator      Authenticator[]
+  SongVote           SongVote?
+  EndSongVoteRequest EndSongVoteRequest[]
+  EndSongVote        EndSongVote?
 }
 
 model Account {
@@ -114,11 +116,13 @@ model Song {
 }
 
 model SongVoteRequest {
-  id        String @id @default(cuid())
-  title     String @default("")
-  url       String @default("")
-  start     Int    @default(0)
-  end       Int    @default(0)
+  id        String  @id @default(cuid())
+  title     String  @default("")
+  url       String  @default("")
+  start     Int     @default(0)
+  end       Int     @default(0)
+  fileId    String  @default("")
+  finished  Boolean @default(false)
   creatorId String
 
   user  User       @relation(fields: [creatorId], references: [id], onDelete: SetDefault)
@@ -132,4 +136,27 @@ model SongVote {
 
   voter       User            @relation(fields: [voterId], references: [id], onDelete: SetDefault)
   songRequest SongVoteRequest @relation(fields: [songRequestId], references: [id], onDelete: Cascade)
+}
+
+model EndSongVoteRequest {
+  id        String  @id @default(cuid())
+  title     String  @default("")
+  url       String  @default("")
+  start     Int     @default(0)
+  end       Int     @default(0)
+  fileId    String  @default("")
+  finished  Boolean @default(false)
+  creatorId String
+
+  user  User          @relation(fields: [creatorId], references: [id], onDelete: SetDefault)
+  votes EndSongVote[]
+}
+
+model EndSongVote {
+  id            String @id @default(cuid())
+  songRequestId String
+  voterId       String @unique
+
+  voter       User               @relation(fields: [voterId], references: [id], onDelete: SetDefault)
+  songRequest EndSongVoteRequest @relation(fields: [songRequestId], references: [id], onDelete: Cascade)
 }

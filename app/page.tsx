@@ -19,6 +19,8 @@ export default async function Home() {
     orderBy: { order: "desc" },
   });
 
+  let base_url = process.env.FILE_SERVER_URL ?? ""
+
   return (
     <Base>
       <Card className="">
@@ -34,7 +36,7 @@ export default async function Home() {
         </CardHeader>
         <CardContent className="flex flex-col justify-center items-center">
           {session ? (
-            <UserSongTable songs={songs} />
+            <UserSongTable songs={songs} base_url={base_url} />
           ) : (
             <p className="text-red-500">Bitte einloggen</p>
           )}

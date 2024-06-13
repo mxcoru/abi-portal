@@ -1,10 +1,9 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
 import { DatabaseClient } from "@/lib/database";
-import { VotingTable } from "@/components/voting/VotingTable";
 import { IsFeatureEnabled } from "@/lib/feature";
 import { AppFeatures } from "@/lib/config/feature";
-import { SongVote, SongVoteRequest } from "@prisma/client";
+import { EndSongVote, EndSongVoteRequest } from "@prisma/client";
 import {
   Card,
   CardContent,
@@ -13,11 +12,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Base } from "@/components/Base";
+import { EndVotingTable } from "@/components/end-voting/VotingTable";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  let votes: (SongVoteRequest & { votes: SongVote[] })[] = [];
+  let votes: (EndSongVoteRequest & { votes: EndSongVote[] })[] = [];
   let userVote = null;
   let canDeleteAll = false;
   let IsVotingEnabled = false;
@@ -25,7 +25,7 @@ export default async function Home() {
   let base_url = "";
 
   if (session?.user) {
-    votes = await DatabaseClient.songVoteRequest.findMany({
+    votes = await DatabaseClient.endSongVoteRequest.findMany({
       include: {
         votes: true,
         user: true,
@@ -36,7 +36,7 @@ export default async function Home() {
         },
       },
     });
-    userVote = await DatabaseClient.songVote.findFirst({
+    userVote = await DatabaseClient.endSongVote.findFirst({
       where: { voterId: session.user.id },
     });
     IsVotingEnabled = await IsFeatureEnabled(AppFeatures.Voting, session.user);
@@ -55,16 +55,16 @@ export default async function Home() {
     <Base>
       <Card className="">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">Die Einlauf Songs</CardTitle>
+          <CardTitle className="text-lg font-bold">Die Ablauf Songs</CardTitle>
           <CardDescription className="w-fit">
-            Hier kannst du das Einlauf Lied wählen, das du haben möchtest. Du
+            Hier kannst du das gemeinsame Ablauf Lied wählen, das du haben möchtest. Du
             kannst gleichzeitig nur ein Lied wählen. Hierfür braucht du keine
             Credits.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col justify-center items-center">
           {session ? (
-            <VotingTable
+            <EndVotingTable
               userId={session.user.id}
               vote={userVote}
               canDeleteAll={canDeleteAll}

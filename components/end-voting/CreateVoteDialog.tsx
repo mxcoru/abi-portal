@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createVoteSong } from "@/app/actions";
+import { createEndVoteSong } from "@/app/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export function VoteSongCreateDialog({
+export function EndVoteSongCreateDialog({
   disabled,
   big,
 }: {
@@ -25,7 +25,7 @@ export function VoteSongCreateDialog({
   big?: boolean;
 }) {
   if (disabled) {
-    return <p className="text-muted">Einlauf Song einreichen</p>;
+    return <p className="text-muted">Ablauf Song einreichen</p>;
   }
 
   let song = {
@@ -36,7 +36,7 @@ export function VoteSongCreateDialog({
   };
 
   async function handleClick() {
-    let result = await createVoteSong(song);
+    let result = await createEndVoteSong(song);
 
     if (!result.success) {
       toast.error(result.error);
@@ -52,14 +52,14 @@ export function VoteSongCreateDialog({
           variant={"secondary"}
           className={cn("w-full", big && "text-xl h-12")}
         >
-          Einlauf Song einreichen
+          Ablauf Song einreichen
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Gruppen Einlauf Song erstellen</DialogTitle>
+          <DialogTitle>Abgehen Song einreichen</DialogTitle>
           <DialogDescription>
-            Hier kannst du ein Einlauf Song einreichen
+            Hier kannst du ein Ablauf Song einreichen
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

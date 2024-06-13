@@ -7,4 +7,5 @@ export enum AppFeatures {
   DeleteAllUserCredits = "delete_all_user_credits",
   SetUserCredits = "set_user_credits",
   AddUserCredits = "add_user_credits",
+  DownloadSong = "download_song",
 }

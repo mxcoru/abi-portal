@@ -9,10 +9,11 @@ import { AppFeatures } from "@/lib/config/feature";
 import { IsUserAdmin } from "@/lib/utils";
 import { UserRole } from "@prisma/client";
 import { VoteSongCreateDialog } from "./voting/CreateVoteDialog";
-
 import { MobileNavigationBar } from "./MobileNavbar";
 import { DeleteAllUserCredits } from "./admin/DeleteAllUserCredits";
 import { SetUserCredits } from "./admin/SetUserCredits";
+import { DownloadAllSongs } from "./admin/DownloadAllSongs";
+import { EndVoteSongCreateDialog } from "./end-voting/CreateVoteDialog";
 
 export async function NavigationBar() {
   const session = await getServerSession(authOptions);
@@ -21,11 +22,13 @@ export async function NavigationBar() {
   let IsSongCreationEnabled = false;
   let IsVoteSongRequestCreationEnabled = false;
   let IsDeleteAllUserCreditsEnabled = false;
+  let IsDownloadAllSongsEnabled = false;
   let CanSetCredits = false;
   let IsAuthEnabled = await IsFeatureEnabled(
     AppFeatures.Authentication,
     session?.user ?? null
   );
+
 
   if (session?.user) {
     IsSongCreationEnabled = await IsFeatureEnabled(
@@ -48,6 +51,11 @@ export async function NavigationBar() {
       session?.user ?? null
     );
 
+    IsDownloadAllSongsEnabled = await IsFeatureEnabled(
+      AppFeatures.DownloadSong,
+      session?.user ?? null
+    );
+
     credits = await getUserCredits();
   }
 
@@ -61,6 +69,7 @@ export async function NavigationBar() {
         vote_song_creation={IsVoteSongRequestCreationEnabled}
         delete_all_user_credits={IsDeleteAllUserCreditsEnabled}
         set_user_credits={CanSetCredits}
+        download_all_songs={IsDownloadAllSongsEnabled}
         credits={credits}
       />
       <MobileNavigationBar
@@ -71,6 +80,7 @@ export async function NavigationBar() {
         vote_song_creation={IsVoteSongRequestCreationEnabled}
         delete_all_user_credits={IsDeleteAllUserCreditsEnabled}
         set_user_credits={CanSetCredits}
+        download_all_songs={IsDownloadAllSongsEnabled}
         credits={credits}
       />
     </>
@@ -86,12 +96,14 @@ function NormalNavigationBar({
   is_auth_enabled,
   delete_all_user_credits,
   set_user_credits,
+  download_all_songs,
 }: {
   admin?: boolean;
   song_creation?: boolean;
   is_auth_enabled: boolean;
   delete_all_user_credits?: boolean;
   set_user_credits?: boolean;
+  download_all_songs?: boolean;
   user?: {
     id: string;
     name: string;
@@ -117,13 +129,19 @@ function NormalNavigationBar({
           <div className="flex flex-col text-center tracking-widest gap-2">
             <Link href="/">Deine Einlauf Songs</Link>
             <Link href="/votes">Gruppen Einlauf Songs</Link>
+            <Link href="/end-votes">Gruppen Ablauf Songs</Link>
             {admin && <Link href="/admin">Admin Panel</Link>}
             <p className="mt-2"></p>
             <SongCreateDialog
               key={"song-create-dialog"}
               disabled={!user || !song_creation}
             />
+
             <VoteSongCreateDialog
+              key={"vote-song-create-dialog"}
+              disabled={!user || !vote_song_creation}
+            />
+            <EndVoteSongCreateDialog
               key={"vote-song-create-dialog"}
               disabled={!user || !vote_song_creation}
             />
@@ -131,6 +149,7 @@ function NormalNavigationBar({
             {set_user_credits && (
               <SetUserCredits canSetCredits={set_user_credits} />
             )}
+            {download_all_songs && <DownloadAllSongs />}
           </div>
         </div>
 

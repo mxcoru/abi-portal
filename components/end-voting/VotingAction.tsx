@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { deleteSongVoteRequest, downloadGroupSong, downloadSong, voteForSong } from "@/app/actions";
+import { deleteEndSongVoteRequest, downloadGroupEndSong, voteForEndSong } from "@/app/actions";
 import { Download, ExternalLink, ScrollText, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
-import { SongVoteRequest } from "@prisma/client";
+import { EndSongVoteRequest } from "@prisma/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ export function VoteAction({
   canDownload,
   base_url,
 }: {
-  voteRequest: SongVoteRequest;
+  voteRequest: EndSongVoteRequest;
   userId: string;
   canDeleteAll: boolean;
   canDownload: boolean;
@@ -44,9 +44,9 @@ export function VoteAction({
   );
 }
 
-function DownloadSongDialog({ voteRequest }: { voteRequest: SongVoteRequest }) {
+function DownloadSongDialog({ voteRequest }: { voteRequest: EndSongVoteRequest }) {
   async function handleClick() {
-    let result = await downloadGroupSong(voteRequest.id);
+    let result = await downloadGroupEndSong(voteRequest.id);
 
     if (!result.success) {
       toast.error(result.error);
@@ -97,11 +97,11 @@ function VoteSongDialog({
   voteRequest,
   disabled: disabled,
 }: {
-  voteRequest: SongVoteRequest;
+  voteRequest: EndSongVoteRequest;
   disabled: boolean;
 }) {
   async function handleClick() {
-    let result = await voteForSong(voteRequest.id);
+    let result = await voteForEndSong(voteRequest.id);
 
     if (!result.success) {
       toast.error(result.error);
@@ -136,10 +136,10 @@ function VoteSongDialog({
 function DeleteVoteSongDialog({
   voteRequest: song,
 }: {
-  voteRequest: SongVoteRequest;
+  voteRequest: EndSongVoteRequest;
 }) {
   async function handleClick() {
-    let result = await deleteSongVoteRequest(song.id);
+    let result = await deleteEndSongVoteRequest(song.id);
 
     if (!result.success) {
       toast.error(result.error);

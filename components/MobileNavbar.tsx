@@ -9,6 +9,9 @@ import { SongCreateDialog } from "./songs/SongCreateDialoag";
 import { VoteSongCreateDialog } from "./voting/CreateVoteDialog";
 import { DeleteAllUserCredits } from "./admin/DeleteAllUserCredits";
 import { SetUserCredits } from "./admin/SetUserCredits";
+import { DownloadAllSongs } from "./admin/DownloadAllSongs";
+import { EndVoteSongCreateDialog } from "./end-voting/CreateVoteDialog";
+import Link from "next/link";
 
 export type UserRole = "SUPER_ADMIN" | "ADMIN" | "MEMBER";
 
@@ -20,6 +23,7 @@ export function MobileNavigationBar({
   credits,
   is_auth_enabled,
   delete_all_user_credits,
+  download_all_songs,
   set_user_credits,
 }: {
   admin?: boolean;
@@ -28,6 +32,7 @@ export function MobileNavigationBar({
   is_auth_enabled: boolean;
   delete_all_user_credits?: boolean;
   set_user_credits?: boolean;
+  download_all_songs?: boolean;
   user?: {
     id: string;
     name: string;
@@ -71,12 +76,17 @@ export function MobileNavigationBar({
 
             <div className="mt-3 flex flex-col items-center text-xl font-semibold">
               <div className="flex flex-col text-center tracking-widest gap-2">
-                <a href="/">Deiner Einlauf Songs</a>
-                <a href="/votes">Gruppen Einlauf Songs</a>
+                <Link href="/">Deine Einlauf Songs</Link>
+                <Link href="/votes">Gruppen Einlauf Songs</Link>
+                <Link href="/end-votes">Gruppen Ablauf Songs</Link>
                 {admin && <a href="/admin">Admin Panel</a>}
                 <p className="mt-2"></p>
                 <SongCreateDialog disabled={!user || !song_creation} big />
                 <VoteSongCreateDialog
+                  disabled={!user || !vote_song_creation}
+                  big
+                />
+                <EndVoteSongCreateDialog
                   disabled={!user || !vote_song_creation}
                   big
                 />
@@ -85,6 +95,7 @@ export function MobileNavigationBar({
                 {set_user_credits && (
                   <SetUserCredits canSetCredits={set_user_credits} big />
                 )}
+                {download_all_songs && <DownloadAllSongs big />}
               </div>
             </div>
 

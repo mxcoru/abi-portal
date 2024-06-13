@@ -22,6 +22,7 @@ export const IsFeatureEnabled = async (
   let ctx = await fhContext
     .userKey(user.id)
     .attributeValue("role", user.role)
+    .attributeValue("date", new Date().toISOString())
     .build();
 
   return ctx.feature(featureName).enabled;

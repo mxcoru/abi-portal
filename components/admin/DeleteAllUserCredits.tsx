@@ -31,7 +31,7 @@ export function DeleteAllUserCredits({ big }: { big?: boolean }) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant={"secondary"} className={cn("", big && "text-xl h-12")}>
-          Delete All User Credits
+          Lösche alle Credits
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -1,4 +1,4 @@
-import { SongVote, SongVoteRequest, User } from "@prisma/client";
+import { EndSongVote, EndSongVoteRequest, User } from "@prisma/client";
 import { VoteAction } from "./VotingAction";
 import {
   Table,
@@ -19,7 +19,7 @@ function VoteRow({
   canDownload,
   base_url,
 }: {
-  voteRequest: SongVoteRequest & { votes: SongVote[]; user: User };
+  voteRequest: EndSongVoteRequest & { votes: EndSongVote[]; user: User };
   voted: boolean;
   userId: string;
   canDeleteAll: boolean;
@@ -78,7 +78,7 @@ function EmptyVoteRow() {
   );
 }
 
-export function VotingTable({
+export function EndVotingTable({
   songRequests: songs,
   vote,
   userId,
@@ -87,8 +87,8 @@ export function VotingTable({
   canDownload,
   base_url,
 }: {
-  songRequests: (SongVoteRequest & { votes: SongVote[]; user: User })[];
-  vote: SongVote | null;
+  songRequests: (EndSongVoteRequest & { votes: EndSongVote[]; user: User })[];
+  vote: EndSongVote | null;
   userId: string;
   canDeleteAll: boolean;
   votingEnabled: boolean;

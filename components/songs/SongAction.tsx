@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deleteSong, updateSong, updateSongOrder } from "@/app/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
-import { ArrowDownUp, Trash2, Pencil } from "lucide-react";
+import { ArrowDownUp, Trash2, Pencil, Download, ExternalLink } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,14 +29,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function SongActions({ song }: { song: Song }) {
+export function SongActions({ song, song_url }: { song: Song, song_url: string | undefined }) {
   return (
     <>
       <SongNewOrderDialog song={song} />
       <SongEditDialog song={song} />
       <SongDeleteDialog song={song} />
+      {song_url && <ViewDownloadLink song_url={song_url} />}
     </>
   );
+}
+
+export function ViewDownloadLink({ song_url }: { song_url: string }) {
+  function handleClick() {
+    window.open(song_url, "_blank");
+  }
+
+  if (song_url) {
+    return (
+      <Button variant={"ghost"} onClick={handleClick}>
+        <ExternalLink className="h-4 w-4" />
+      </Button>
+    );
+  }
 }
 
 function SongEditDialog({ song }: { song: Song }) {

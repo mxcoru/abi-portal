@@ -23,7 +23,7 @@ function GetSongStatus({ status }: { status: SongStatus }) {
   }
 }
 
-function UserSongRow({ song }: { song: Song }) {
+function UserSongRow({ song, base_url }: { song: Song, base_url: string }) {
   return (
     <TableRow key={song.id}>
       <TableCell>
@@ -32,7 +32,7 @@ function UserSongRow({ song }: { song: Song }) {
       <TableCell>{song.title}</TableCell>
       <TableCell className="hidden md:table-cell">{song.url}</TableCell>
       <TableCell>
-        <SongActions song={song} />
+        <SongActions song={song} song_url={song.status == SongStatus.FINISHED ? `${base_url}/${song.fileId}.mp3` : ""} />
       </TableCell>
     </TableRow>
   );
@@ -48,7 +48,7 @@ function EmptySongRow() {
   );
 }
 
-export function UserSongTable({ songs }: { songs: Song[] }) {
+export function UserSongTable({ songs, base_url }: { songs: Song[], base_url: string }) {
   let ShouldDisplayEmptyRow = songs.length == 0;
 
   return (
@@ -69,7 +69,7 @@ export function UserSongTable({ songs }: { songs: Song[] }) {
         {ShouldDisplayEmptyRow ? (
           <EmptySongRow key={"empty-song-row"} />
         ) : (
-          songs.map((song) => <UserSongRow key={song.id} song={song} />)
+          songs.map((song) => <UserSongRow key={song.id} song={song} base_url={base_url} />)
         )}
       </TableBody>
     </Table>

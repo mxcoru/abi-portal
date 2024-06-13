@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationBar } from "@/components/NavigationBar";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
@@ -61,6 +61,17 @@ export default async function Home() {
     session.user
   );
 
+  let CanDownloadSongs = await IsFeatureEnabled(
+    AppFeatures.DownloadSong,
+    session.user
+  );
+
+  let finished_songs = await DatabaseClient.song.count({
+    where: {
+      status: SongStatus.FINISHED,
+    },
+  });
+
   return (
     <Base adminLayout>
       <Card className="row-start-1 col-start-1 lg:col-span-2 row-span-2 col-span-6">
@@ -83,15 +94,20 @@ export default async function Home() {
           <BrokeeTable users={brokee} canAddCredits={CanAddCredits} />
         </CardContent>
       </Card>
-      <Card className="row-start-5 lg:row-start-3 col-start-1 xl:col-start-2 xl:col-span-4 md:col-span-6 row-span-2 col-span-6">
+      <Card className="row-start-5 lg:row-start-3 col-start-1 xl:col-start-1 row-span-2 col-span-6">
         <CardHeader className="flex justify-between items-center">
           <CardTitle className="text-lg font-bold">
             Songs In Bearbeitung
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-center items-center max-h-[370px] overflow-y-auto">
-          <RequestedSongTable songs={request_songs} />
+          <RequestedSongTable songs={request_songs} download={CanDownloadSongs} />
         </CardContent>
+        <CardFooter>
+          <p className="text-center text-sm">
+            {finished_songs}  Songs sind fertig
+          </p>
+        </CardFooter>
       </Card>
     </Base>
   );
