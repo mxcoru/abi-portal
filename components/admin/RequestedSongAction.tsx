@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { declineSong, downloadSong } from "@/app/actions";
+import { downloadSong } from "@/app/actions";
+import { declineSong } from "@/app/admin/actions";
 import { Download, X } from "lucide-react";
 import { Button } from "../ui/button";
 import {

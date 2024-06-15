@@ -13,20 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createEndVoteSong } from "@/app/actions";
+import { createEndVoteSong } from "@/app/end-votes/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
 
 export function EndVoteSongCreateDialog({
   disabled,
-  big,
 }: {
   disabled?: boolean;
-  big?: boolean;
 }) {
-  if (disabled) {
-    return <p className="text-muted">Ablauf Song einreichen</p>;
-  }
+
 
   let song = {
     start: 0,
@@ -49,10 +45,11 @@ export function EndVoteSongCreateDialog({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant={"secondary"}
-          className={cn("w-full", big && "text-xl h-12")}
+          disabled={disabled}
+          variant={"default"}
+          className="rounded-full"
         >
-          Ablauf Song einreichen
+          <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

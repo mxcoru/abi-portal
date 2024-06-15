@@ -14,9 +14,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { Download } from "lucide-react";
 
-export function DownloadAllSongs({ big }: { big?: boolean }) {
+export function DownloadAllSongs({ disabled }: { disabled?: boolean }) {
     async function handleClick() {
         let result = await downloadAllRequestedSongs();
 
@@ -30,8 +30,12 @@ export function DownloadAllSongs({ big }: { big?: boolean }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant={"secondary"} className={cn("", big && "text-xl h-12")}>
-                    Lade alle Songs herunter
+                <Button
+                    disabled={disabled}
+                    variant={"outline"}
+                    className="rounded-full"
+                >
+                    <Download className="h-4 w-4" />
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

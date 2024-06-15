@@ -15,18 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSong } from "@/app/actions";
 import { formatSeconds, getSecondsFromTime } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
 
 export function SongCreateDialog({
   disabled,
-  big,
 }: {
   disabled?: boolean;
-  big?: boolean;
 }) {
-  if (disabled) {
-    return <p className="text-muted">Perönlichen Song einreichen</p>;
-  }
 
   let song = {
     start: 0,
@@ -49,10 +44,11 @@ export function SongCreateDialog({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant={"secondary"}
-          className={cn("w-full", big && "text-xl h-12")}
+          disabled={disabled}
+          variant={"default"}
+          className="rounded-full"
         >
-          Perönlichen Song einreichen
+          <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

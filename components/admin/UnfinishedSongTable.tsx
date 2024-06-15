@@ -2,7 +2,6 @@ import { Song, SongStatus, User } from "@prisma/client";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,

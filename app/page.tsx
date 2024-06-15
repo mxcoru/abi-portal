@@ -10,6 +10,9 @@ import { getServerSession } from "next-auth/next";
 import { DatabaseClient } from "@/lib/database";
 import { UserSongTable } from "@/components/songs/UserSongTable";
 import { Base } from "@/components/Base";
+import { SongCreateDialog } from "@/components/songs/SongCreateDialoag";
+import { AppFeatures } from "@/lib/config/feature";
+import { IsFeatureEnabled } from "@/lib/feature";
 
 export default async function Home() {
   let session = await getServerSession(authOptions);
@@ -19,14 +22,26 @@ export default async function Home() {
     orderBy: { order: "desc" },
   });
 
+  let IsSongCreationEnabled = false;
+
+  if (session?.user) {
+    IsSongCreationEnabled = await IsFeatureEnabled(
+      AppFeatures.SongCreation,
+      session.user
+    );
+  }
+
+
   let base_url = process.env.FILE_SERVER_URL ?? ""
 
   return (
     <Base>
       <Card className="">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">
-            Deine Song Anfragen
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+            <p></p>
+            <p>Deine Song Anfragen</p>
+            <SongCreateDialog disabled={!IsSongCreationEnabled} />
           </CardTitle>
           <CardDescription className="w-fit">
             Zur Bearbeitung und Löschung braucht du ein Credit. Wenn du deine

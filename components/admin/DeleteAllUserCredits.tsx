@@ -2,7 +2,7 @@
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { deleteAllCredits } from "@/app/actions";
+import { deleteAllCredits } from "@/app/admin/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { DollarSign } from "lucide-react";
 
-export function DeleteAllUserCredits({ big }: { big?: boolean }) {
+export function DeleteAllUserCredits({ disabled }: { disabled?: boolean }) {
   async function handleClick() {
     let result = await deleteAllCredits();
 
@@ -30,8 +30,12 @@ export function DeleteAllUserCredits({ big }: { big?: boolean }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={"secondary"} className={cn("", big && "text-xl h-12")}>
-          Lösche alle Credits
+        <Button
+          disabled={disabled}
+          variant={"outline"}
+          className="rounded-full text-red-700"
+        >
+          <DollarSign className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

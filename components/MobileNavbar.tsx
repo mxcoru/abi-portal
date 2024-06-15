@@ -17,22 +17,12 @@ export type UserRole = "SUPER_ADMIN" | "ADMIN" | "MEMBER";
 
 export function MobileNavigationBar({
   admin,
-  song_creation,
   user,
-  vote_song_creation,
   credits,
   is_auth_enabled,
-  delete_all_user_credits,
-  download_all_songs,
-  set_user_credits,
 }: {
   admin?: boolean;
-  song_creation?: boolean;
-  vote_song_creation?: boolean;
   is_auth_enabled: boolean;
-  delete_all_user_credits?: boolean;
-  set_user_credits?: boolean;
-  download_all_songs?: boolean;
   user?: {
     id: string;
     name: string;
@@ -80,22 +70,6 @@ export function MobileNavigationBar({
                 <Link href="/votes">Gruppen Einlauf Songs</Link>
                 <Link href="/end-votes">Gruppen Ablauf Songs</Link>
                 {admin && <a href="/admin">Admin Panel</a>}
-                <p className="mt-2"></p>
-                <SongCreateDialog disabled={!user || !song_creation} big />
-                <VoteSongCreateDialog
-                  disabled={!user || !vote_song_creation}
-                  big
-                />
-                <EndVoteSongCreateDialog
-                  disabled={!user || !vote_song_creation}
-                  big
-                />
-
-                {delete_all_user_credits && <DeleteAllUserCredits big />}
-                {set_user_credits && (
-                  <SetUserCredits canSetCredits={set_user_credits} big />
-                )}
-                {download_all_songs && <DownloadAllSongs big />}
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { deleteEndSongVoteRequest, downloadGroupEndSong, voteForEndSong } from "@/app/actions";
+import { deleteEndSongVoteRequest, downloadGroupEndSong, voteForEndSong } from "@/app/end-votes/actions";
 import { Download, ExternalLink, ScrollText, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { EndSongVoteRequest } from "@prisma/client";

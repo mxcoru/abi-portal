@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { addCredits } from "@/app/actions";
+import { addCredits } from "@/app/admin/actions";
 import { DollarSign } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";

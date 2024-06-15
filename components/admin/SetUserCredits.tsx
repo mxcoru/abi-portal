@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { toast } from "sonner";
-import { addCredits, setCredits } from "@/app/actions";
+import { addCredits, setCredits } from "@/app/admin/actions";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -14,28 +14,24 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { DollarSign } from "lucide-react";
 
 export function SetUserCredits({
-  canSetCredits,
-  big,
+  disabled,
 }: {
-  canSetCredits: boolean;
-  big?: boolean;
+  disabled: boolean;
 }) {
   return (
     <>
-      <SetCreditsDialog canSetCredits={canSetCredits} big={big} />
+      <SetCreditsDialog disabled={disabled} />
     </>
   );
 }
 
 function SetCreditsDialog({
-  canSetCredits,
-  big,
+  disabled,
 }: {
-  canSetCredits: boolean;
-  big?: boolean;
+  disabled: boolean;
 }) {
   let credits = 0;
   let name = "";
@@ -54,11 +50,11 @@ function SetCreditsDialog({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant={"secondary"}
-          disabled={!canSetCredits}
-          className={cn("", big && "text-xl h-12")}
+          disabled={disabled}
+          variant={"outline"}
+          className="rounded-full text-green-700"
         >
-          Setze Credits vom Benutzer
+          <DollarSign className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

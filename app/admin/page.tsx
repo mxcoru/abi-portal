@@ -10,6 +10,9 @@ import { RequestedSongTable } from "@/components/admin/RequestedSongTable";
 import { Base } from "@/components/Base";
 import { AppFeatures } from "@/lib/config/feature";
 import { IsFeatureEnabled } from "@/lib/feature";
+import { SetUserCredits } from "@/components/admin/SetUserCredits";
+import { DeleteAllUserCredits } from "@/components/admin/DeleteAllUserCredits";
+import { DownloadAllSongs } from "@/components/admin/DownloadAllSongs";
 
 export default async function Home() {
   let session = await getServerSession(authOptions);
@@ -66,6 +69,16 @@ export default async function Home() {
     session.user
   );
 
+  let CanSetUserCredits = await IsFeatureEnabled(
+    AppFeatures.SetUserCredits,
+    session.user
+  );
+
+  let CanDeleteAllCredits = await IsFeatureEnabled(
+    AppFeatures.DeleteAllUserCredits,
+    session.user
+  );
+
   let finished_songs = await DatabaseClient.song.count({
     where: {
       status: SongStatus.FINISHED,
@@ -86,8 +99,10 @@ export default async function Home() {
       </Card>
       <Card className="row-start-3 lg:row-start-1 col-start-1 lg:col-start-5 lg:col-span-2 row-span-2 col-span-6">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">
-            Benutzer ohne Credits
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+            <DeleteAllUserCredits disabled={!CanDeleteAllCredits} />
+            <p>Benutzer ohne Credits</p>
+            <SetUserCredits disabled={!CanSetUserCredits} />
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-center items-center max-h-[370px] overflow-y-auto ">
@@ -96,8 +111,10 @@ export default async function Home() {
       </Card>
       <Card className="row-start-5 lg:row-start-3 col-start-1 xl:col-start-1 row-span-2 col-span-6">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">
-            Songs In Bearbeitung
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+            <p ></p>
+            <p>Songs In Bearbeitung</p>
+            <DownloadAllSongs disabled={!CanDownloadSongs} />
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-center items-center max-h-[370px] overflow-y-auto">

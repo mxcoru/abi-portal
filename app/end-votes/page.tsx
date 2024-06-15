@@ -13,12 +13,14 @@ import {
 } from "@/components/ui/card";
 import { Base } from "@/components/Base";
 import { EndVotingTable } from "@/components/end-voting/VotingTable";
+import { EndVoteSongCreateDialog } from "@/components/end-voting/CreateVoteDialog";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   let votes: (EndSongVoteRequest & { votes: EndSongVote[] })[] = [];
   let userVote = null;
+  let IsVoteCreationEnabled = false;
   let canDeleteAll = false;
   let IsVotingEnabled = false;
   let canDownload = false;
@@ -36,10 +38,13 @@ export default async function Home() {
         },
       },
     });
+
     userVote = await DatabaseClient.endSongVote.findFirst({
       where: { voterId: session.user.id },
     });
+
     IsVotingEnabled = await IsFeatureEnabled(AppFeatures.Voting, session.user);
+
     canDeleteAll = await IsFeatureEnabled(
       AppFeatures.GroupSongRequestAdmin,
       session.user
@@ -48,6 +53,12 @@ export default async function Home() {
       AppFeatures.DownloadSong,
       session.user
     );
+
+    IsVoteCreationEnabled = await IsFeatureEnabled(
+      AppFeatures.VoteSongRequestCreation,
+      session.user
+    );
+
     base_url = process.env.FILE_SERVER_URL ?? "";
   }
 
@@ -55,7 +66,11 @@ export default async function Home() {
     <Base>
       <Card className="">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">Die Ablauf Songs</CardTitle>
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+            <p></p>
+            <p>Die Ablauf Songs</p>
+            <EndVoteSongCreateDialog disabled={!IsVoteCreationEnabled} />
+          </CardTitle>
           <CardDescription className="w-fit">
             Hier kannst du das gemeinsame Ablauf Lied wählen, das du haben möchtest. Du
             kannst gleichzeitig nur ein Lied wählen. Hierfür braucht du keine

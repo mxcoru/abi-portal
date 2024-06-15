@@ -13,11 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Base } from "@/components/Base";
+import { VoteSongCreateDialog } from "@/components/voting/CreateVoteDialog";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   let votes: (SongVoteRequest & { votes: SongVote[] })[] = [];
+  let IsVoteCreationEnabled = false;
   let userVote = null;
   let canDeleteAll = false;
   let IsVotingEnabled = false;
@@ -36,18 +38,28 @@ export default async function Home() {
         },
       },
     });
+
     userVote = await DatabaseClient.songVote.findFirst({
       where: { voterId: session.user.id },
     });
+
     IsVotingEnabled = await IsFeatureEnabled(AppFeatures.Voting, session.user);
+
     canDeleteAll = await IsFeatureEnabled(
       AppFeatures.GroupSongRequestAdmin,
       session.user
     );
+
     canDownload = await IsFeatureEnabled(
       AppFeatures.DownloadSong,
       session.user
     );
+
+    IsVoteCreationEnabled = await IsFeatureEnabled(
+      AppFeatures.VoteSongRequestCreation,
+      session.user
+    );
+
     base_url = process.env.FILE_SERVER_URL ?? "";
   }
 
@@ -55,7 +67,11 @@ export default async function Home() {
     <Base>
       <Card className="">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold">Die Einlauf Songs</CardTitle>
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+            <p></p>
+            <p>Die Einlauf Songs</p>
+            <VoteSongCreateDialog disabled={!IsVoteCreationEnabled} />
+          </CardTitle>
           <CardDescription className="w-fit">
             Hier kannst du das Einlauf Lied wählen, das du haben möchtest. Du
             kannst gleichzeitig nur ein Lied wählen. Hierfür braucht du keine
