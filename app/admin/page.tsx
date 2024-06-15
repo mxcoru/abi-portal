@@ -99,7 +99,7 @@ export default async function Home() {
       </Card>
       <Card className="row-start-3 lg:row-start-1 col-start-1 lg:col-start-5 lg:col-span-2 row-span-2 col-span-6">
         <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full">
+          <CardTitle className="text-lg font-bold flex flex-row place-content-between w-full gap-1">
             <DeleteAllUserCredits disabled={!CanDeleteAllCredits} />
             <p>Benutzer ohne Credits</p>
             <SetUserCredits disabled={!CanSetUserCredits} />
