@@ -9,7 +9,7 @@ import { getServerSession } from "next-auth";
 
 export default async function Viewer() {
     let session = await getServerSession(authOptions);
-    let IsLiveviewEnabled = IsFeatureEnabled(AppFeatures.Liveview, session?.user);
+    let IsLiveviewEnabled = await IsFeatureEnabled(AppFeatures.Liveview, session?.user);
 
     if (!IsLiveviewEnabled) {
         return <p className="text-red-500">Liveview ist deaktiviert</p>;
