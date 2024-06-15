@@ -8,4 +8,6 @@ export enum AppFeatures {
   SetUserCredits = "set_user_credits",
   AddUserCredits = "add_user_credits",
   DownloadSong = "download_song",
+  LiveviewController = "liveview_controller",
+  Liveview = "liveview",
 }

@@ -19,6 +19,19 @@ enum UserRole {
   MEMBER
 }
 
+enum SongStatus {
+  REQUESTED
+  FINISHED
+  DECLINED
+}
+
+enum Action {
+  USER_SONG_PAGE
+  GROUP_SONG_PAGE
+  GROUP_END_SONG_PAGE
+  NONE
+}
+
 model User {
   id                 String               @id @default(cuid())
   name               String?
@@ -93,12 +106,6 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
-enum SongStatus {
-  REQUESTED
-  FINISHED
-  DECLINED
-}
-
 model Song {
   id        String     @id @default(cuid())
   order     Int        @default(0)
@@ -159,4 +166,11 @@ model EndSongVote {
 
   voter       User               @relation(fields: [voterId], references: [id], onDelete: SetDefault)
   songRequest EndSongVoteRequest @relation(fields: [songRequestId], references: [id], onDelete: Cascade)
+}
+
+model TimetableEntry {
+  id     String @id @default(cuid())
+  name   String @default("")
+  order  Int    @default(0)
+  action Action @default(NONE)
 }
