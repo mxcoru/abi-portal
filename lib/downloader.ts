@@ -1,5 +1,19 @@
-import { ManyVideoDownloadRequest, ManyVideoDownloadResponse } from "./downloader";
 import axios from "axios";
+
+export type ManyVideoDownloadRequest = VideoDownloadRequest[];
+export type ManyVideoDownloadResponse = VideoDownloadResponse[];
+
+export interface VideoDownloadRequest {
+    url: string;
+    start: number;
+    end: number;
+}
+
+export interface VideoDownloadResponse {
+    file_id: string;
+    url: string;
+}
+
 
 export async function SendDownloadRequest(data: ManyVideoDownloadRequest): Promise<ManyVideoDownloadResponse | null> {
     let request = await axios.get(process.env.DOWNLOADER_URL as string, {
@@ -29,17 +43,4 @@ export async function SendDeleteRequest(file_id: string) {
     if (request.status != 204) {
         return
     }
-}
-export type ManyVideoDownloadRequest = VideoDownloadRequest[];
-export type ManyVideoDownloadResponse = VideoDownloadResponse[];
-
-export interface VideoDownloadRequest {
-    url: string;
-    start: number;
-    end: number;
-}
-
-export interface VideoDownloadResponse {
-    file_id: string;
-    url: string;
 }
