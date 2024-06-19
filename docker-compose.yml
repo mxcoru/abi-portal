@@ -31,5 +31,10 @@ services:
     volumes:
       - ./downloader:/app/downloader
 
+  websocket-server:
+    image: mxcoru/abi-websocket:latest
+    ports:
+      - 3001:3000
+
 volumes:
   postgres-data:

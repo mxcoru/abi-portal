@@ -20,9 +20,15 @@ export function MobileNavigationBar({
   user,
   credits,
   is_auth_enabled,
+  is_liveview_enabled,
+  is_liveview_controller_enabled,
+  is_timetable_enabled,
 }: {
   admin?: boolean;
   is_auth_enabled: boolean;
+  is_liveview_enabled: boolean;
+  is_liveview_controller_enabled: boolean;
+  is_timetable_enabled: boolean;
   user?: {
     id: string;
     name: string;
@@ -69,6 +75,9 @@ export function MobileNavigationBar({
                 <Link href="/">Deine Einlauf Songs</Link>
                 <Link href="/votes">Gruppen Einlauf Songs</Link>
                 <Link href="/end-votes">Gruppen Ablauf Songs</Link>
+                {is_liveview_controller_enabled && <Link href="/controller">Zum Controller</Link>}
+                {is_liveview_enabled && <Link href="/liveview">Zum Liveview</Link>}
+                {is_timetable_enabled && <Link href="/timetable">Zum Zeitplan</Link>}
                 {admin && <a href="/admin">Admin Panel</a>}
               </div>
             </div>

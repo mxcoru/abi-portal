@@ -17,7 +17,6 @@ export function SocketProvider({ children, socketUrl }: { children: ReactNode, s
     let [timeoutId, setTimeoutId] = useState<number | null>(null);
     let [socketSession, setSocketSession] = useState<string | null>(null);
     let [command, setCommand] = useState<Command | null>(null);
-    let [lastCommand, setLastCommand] = useState<Command | null>(null);
     let [currentSettings, setCurrentSettings] = useState<CurrentSettings>(newCurrentSettings());
 
 
@@ -66,13 +65,64 @@ export function SocketProvider({ children, socketUrl }: { children: ReactNode, s
         })
 
         socket.on("command.controller", (newCommand: Command) => {
-            if (lastCommand && Object.is(lastCommand, newCommand)) {
-                return;
-            }
-
-            setLastCommand(command);
+            if (newCommand?.requestId == command?.requestId) return
 
             setCommand(newCommand);
+
+            console.log(newCommand);
+
+            switch (newCommand.type) {
+                case "playUserSong":
+                    setCurrentSettings((currentSettings) => {
+                        return {
+                            ...currentSettings,
+                            currentUserSong: newCommand.data
+                        }
+                    })
+                    break;
+                case "playerGroupSong":
+                    setCurrentSettings((currentSettings) => {
+                        return {
+                            ...currentSettings,
+                            currentPlayerGroup: {
+                                fileId: newCommand.data.fileId,
+                                start: newCommand.data.start,
+                                end: newCommand.data.end,
+                            }
+                        }
+                    })
+                    break;
+                case "playerGroupEnd":
+                    setCurrentSettings((currentSettings) => {
+                        return {
+                            ...currentSettings,
+                            currentPlayerGroupEnd: {
+                                fileId: newCommand.data.fileId,
+                                start: newCommand.data.start,
+                                end: newCommand.data.end,
+                            }
+                        }
+                    })
+                    break;
+                case "changePage":
+                    setCurrentSettings((currentSettings) => {
+                        return {
+                            ...currentSettings,
+                            currentPage: newCommand.data.page,
+                        }
+                    })
+                    break;
+                case "setCurrentTimetableEntry":
+                    setCurrentSettings((currentSettings) => {
+                        return {
+                            ...currentSettings,
+                            currentTimetableEntry: newCommand.data.id,
+                        }
+                    })
+                    break;
+                default:
+                    break;
+            }
         })
 
         socket.on("disconnect", () => {
@@ -88,66 +138,6 @@ export function SocketProvider({ children, socketUrl }: { children: ReactNode, s
         }
     }, [])
 
-    useEffect(() => {
-        if (command) {
-            switch (command.type) {
-                case "playUserSong":
-                    setCurrentSettings((currentSettings) => {
-                        return {
-                            ...currentSettings,
-                            currentUserSong: {
-                                fileId: command.data.fileId,
-                                start: command.data.start,
-                                end: command.data.end,
-                            }
-                        }
-                    })
-                    break;
-                case "playerGroupSong":
-                    setCurrentSettings((currentSettings) => {
-                        return {
-                            ...currentSettings,
-                            currentPlayerGroup: {
-                                fileId: command.data.fileId,
-                                start: command.data.start,
-                                end: command.data.end,
-                            }
-                        }
-                    })
-                    break;
-                case "playerGroupEnd":
-                    setCurrentSettings((currentSettings) => {
-                        return {
-                            ...currentSettings,
-                            currentPlayerGroupEnd: {
-                                fileId: command.data.fileId,
-                                start: command.data.start,
-                                end: command.data.end,
-                            }
-                        }
-                    })
-                    break;
-                case "changePage":
-                    setCurrentSettings((currentSettings) => {
-                        return {
-                            ...currentSettings,
-                            currentPage: command.data.page,
-                        }
-                    })
-                    break;
-                case "setCurrentTimetableEntry":
-                    setCurrentSettings((currentSettings) => {
-                        return {
-                            ...currentSettings,
-                            currentTimetableEntry: command.data.id,
-                        }
-                    })
-                    break;
-                default:
-                    break;
-            }
-        }
-    }, [command])
 
 
     return (

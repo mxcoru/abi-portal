@@ -1,5 +1,5 @@
-import { ControllerPage } from "@/components/liveview/ControllerPage";
-import { SocketProvider } from "@/components/liveview/SocketProvider";
+import { ControllerPage } from "@/components/liveview/controller/ControllerPage";
+import { SocketProvider } from "@/components/liveview/shared/SocketProvider";
 import { authOptions } from "@/lib/auth";
 import { AppFeatures } from "@/lib/config/feature";
 import { IsFeatureEnabled } from "@/lib/feature";

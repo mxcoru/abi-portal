@@ -18,6 +18,21 @@ export async function NavigationBar() {
     session?.user ?? null
   );
 
+  let IsLiveviewEnabled = await IsFeatureEnabled(
+    AppFeatures.Liveview,
+    session?.user ?? null
+  );
+
+  let IsLiveviewControllerEnabled = await IsFeatureEnabled(
+    AppFeatures.LiveviewController,
+    session?.user ?? null
+  );
+
+  let IsTimetableEnabled = await IsFeatureEnabled(
+    AppFeatures.ViewTimetable,
+    session?.user ?? null
+  );
+
 
   if (session?.user) {
     credits = await getUserCredits();
@@ -29,12 +44,18 @@ export async function NavigationBar() {
         admin={IsUserAdmin(session?.user ?? { role: UserRole.MEMBER })}
         user={session?.user}
         is_auth_enabled={IsAuthEnabled}
+        is_liveview_enabled={IsLiveviewEnabled}
+        is_liveview_controller_enabled={IsLiveviewControllerEnabled}
+        is_timetable_enabled={IsTimetableEnabled}
         credits={credits}
       />
       <MobileNavigationBar
         admin={IsUserAdmin(session?.user ?? { role: UserRole.MEMBER })}
         user={session?.user}
         is_auth_enabled={IsAuthEnabled}
+        is_liveview_enabled={IsLiveviewEnabled}
+        is_liveview_controller_enabled={IsLiveviewControllerEnabled}
+        is_timetable_enabled={IsTimetableEnabled}
         credits={credits}
       />
     </>
@@ -46,9 +67,15 @@ function NormalNavigationBar({
   user,
   credits,
   is_auth_enabled,
+  is_liveview_enabled,
+  is_liveview_controller_enabled,
+  is_timetable_enabled,
 }: {
   admin?: boolean;
   is_auth_enabled: boolean;
+  is_liveview_enabled: boolean;
+  is_liveview_controller_enabled: boolean;
+  is_timetable_enabled: boolean;
   user?: {
     id: string;
     name: string;
@@ -74,6 +101,9 @@ function NormalNavigationBar({
             <Link href="/">Deine Einlauf Songs</Link>
             <Link href="/votes">Gruppen Einlauf Songs</Link>
             <Link href="/end-votes">Gruppen Ablauf Songs</Link>
+            {is_liveview_controller_enabled && <Link href="/controller">Liveview Controller</Link>}
+            {is_liveview_enabled && <Link href="/liveview">Liveview Display</Link>}
+            {is_timetable_enabled && <Link href="/timetable">Abi Zeitplan</Link>}
             {admin && <Link href="/admin">Admin Panel</Link>}
           </div>
         </div>

@@ -38,7 +38,7 @@ export function useCurrentPage() {
         throw new Error("useCurrentPage must be used within a <SocketProvider>");
     }
 
-    return currentPage;
+    return currentPage.currentPage;
 }
 
 export function useCurrentUserSong() {
@@ -48,7 +48,7 @@ export function useCurrentUserSong() {
         throw new Error("useCurrentUserSong must be used within a <SocketProvider>");
     }
 
-    return currentUserSong;
+    return currentUserSong.currentUserSong;
 }
 
 export function useCurrentPlayerGroup() {
@@ -58,7 +58,7 @@ export function useCurrentPlayerGroup() {
         throw new Error("useCurrentPlayerGroup must be used within a <SocketProvider>");
     }
 
-    return currentPlayerGroup;
+    return currentPlayerGroup.currentPlayerGroup;
 }
 
 export function useCurrentPlayerGroupEnd() {
@@ -68,7 +68,7 @@ export function useCurrentPlayerGroupEnd() {
         throw new Error("useCurrentPlayerGroupEnd must be used within a <SocketProvider>");
     }
 
-    return currentPlayerGroupEnd;
+    return currentPlayerGroupEnd.currentPlayerGroupEnd;
 }
 
 export function useCurrentTimetableEntry() {
@@ -78,5 +78,5 @@ export function useCurrentTimetableEntry() {
         throw new Error("useCurrentTimetableEntry must be used within a <SocketProvider>");
     }
 
-    return currentTimetableEntry;
+    return currentTimetableEntry.currentTimetableEntry;
 }

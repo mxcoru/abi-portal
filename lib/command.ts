@@ -1,9 +1,15 @@
-export type Command = {
+export type Command = { requestId: string } & ({
     "type": "playUserSong",
     data: {
-        fileId: string,
-        start: number,
-        end: number
+        id: string,
+        name: string,
+        songs: {
+            title: string,
+            fileId: string,
+            start: number,
+            end: number
+        }[]
+
     }
 } | {
     type: "changePage",
@@ -13,6 +19,7 @@ export type Command = {
 } | {
     type: "playerGroupSong",
     data: {
+        title: string,
         fileId: string,
         start: number,
         end: number
@@ -20,6 +27,7 @@ export type Command = {
 } | {
     type: "playerGroupEnd",
     data: {
+        title: string,
         fileId: string,
         start: number,
         end: number
@@ -29,14 +37,18 @@ export type Command = {
     data: {
         id: string,
     }
-}
+})
 
 export interface CurrentSettings {
     currentTimetableEntry: string | null;
     currentUserSong: {
-        fileId: string,
-        start: number,
-        end: number
+        name: string,
+        songs: {
+            title: string,
+            fileId: string,
+            start: number,
+            end: number
+        }[]
     } | null;
     currentPlayerGroup: {
         fileId: string,

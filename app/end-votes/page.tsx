@@ -77,7 +77,7 @@ export default async function Home() {
             Credits.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col justify-center items-center max-h-[320px]">
+        <CardContent className="flex flex-col justify-center items-center xl:max-h-[700px] max-h-[320px]">
           {session ? (
             <EndVotingTable
               userId={session.user.id}

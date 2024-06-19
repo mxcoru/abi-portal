@@ -10,4 +10,6 @@ export enum AppFeatures {
   DownloadSong = "download_song",
   LiveviewController = "liveview_controller",
   Liveview = "liveview",
+  ViewTimetable = "view_timetable",
+  UpdateTimetable = "update_timetable",
 }

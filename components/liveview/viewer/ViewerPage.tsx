@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { OTPInput } from "./OTP";
-import { useControllerCount, useSocket, useSocketSession } from "./hooks";
+import { OTPInput } from "../shared/OTP";
+import { useControllerCount, useSocket, useSocketSession } from "../shared/hooks";
+import { PageRouter } from "./PageRouter";
 
-export function ViewerPage({ otp }: { otp: string }) {
+export function ViewerPage({ otp, fileServerUrl }: { otp: string, fileServerUrl: string }) {
     let socket = useSocket();
     let controllerCount = useControllerCount();
     let session = useSocketSession();
@@ -48,11 +49,6 @@ export function ViewerPage({ otp }: { otp: string }) {
     }
 
     return (
-        <div className="w-svw h-svh flex flex-row">
-            <div className="w-full h-svh flex flex-col justify-center items-center">
-                Es sind {controllerCount} Controller vorhanden
-                <OTPInput value={otp} disabled />
-            </div>
-        </div>
+        <PageRouter fileServerUrl={fileServerUrl} />
     )
 }   

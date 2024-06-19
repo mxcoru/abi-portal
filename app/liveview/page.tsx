@@ -1,6 +1,6 @@
 
-import { SocketProvider } from "@/components/liveview/SocketProvider";
-import { ViewerPage } from "@/components/liveview/ViewerPage";
+import { SocketProvider } from "@/components/liveview/shared/SocketProvider";
+import { ViewerPage } from "@/components/liveview/viewer/ViewerPage";
 import { authOptions } from "@/lib/auth";
 import { AppFeatures } from "@/lib/config/feature";
 import { IsFeatureEnabled } from "@/lib/feature";
@@ -20,7 +20,7 @@ export default async function Viewer() {
 
     return (
         <SocketProvider socketUrl={process.env.WEBSOCKET_SERVER_URL ?? "http://localhost:3001"}>
-            <ViewerPage otp={otp} />
+            <ViewerPage otp={otp} fileServerUrl={process.env.FILE_SERVER_URL ?? ""} />
         </SocketProvider>
 
     );
